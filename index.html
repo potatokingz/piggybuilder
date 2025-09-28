@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alfis and Tigry</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Robust Font Awesome Kit for reliable icons -->
+    <script src="https://kit.fontawesome.com/4a0d9e3381.js" crossorigin="anonymous"></script>
+
+    <style>
+        :root {
+            --dark-bg: #0d0d0d; /* Even darker background */
+            --primary-green: #00ff9d;
+            --primary-orange: #ff7b00;
+            --light-gray: #1a1a1a;
+            --text-color: #e0e0e0;
+            --font-header: 'Orbitron', sans-serif;
+            --font-body: 'Poppins', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; /* Hide default cursor */
+        }
+
+        html {
+            /* scroll-behavior is handled by JS now */
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+        }
+        
+        /* --- NEW: Preloader Animation --- */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: var(--dark-bg);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light-gray);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* --- NEW: Custom Animated Cursor --- */
+        .cursor-dot, .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9998;
+            pointer-events: none;
+            transition: transform 0.15s ease-out, width 0.15s ease-out, height 0.15s ease-out;
+        }
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-green);
+        }
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 255, 157, 0.2);
+        }
+
+        /* --- Animations --- */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes subtleZoom {
+            0% { transform: scale(1.02); }
+            100% { transform: scale(1.07); }
+        }
+        @keyframes glowGreen {
+            0%, 100% { text-shadow: 0 0 5px var(--primary-green), 0 0 10px var(--primary-green); }
+            50% { text-shadow: 0 0 15px var(--primary-green), 0 0 25px var(--primary-green); }
+        }
+        @keyframes glowOrange {
+            0%, 100% { text-shadow: 0 0 5px var(--primary-orange), 0 0 10px var(--primary-orange); }
+            50% { text-shadow: 0 0 15px var(--primary-orange), 0 0 25px var(--primary-orange); }
+        }
+        @keyframes slideInFromLeft {
+            0% { transform: translateX(-100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInFromRight {
+            0% { transform: translateX(100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* General Styling */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        section { padding: 120px 0; overflow: hidden; }
+        .animated-section { opacity: 0; transition: opacity 0.6s; }
+        .animated-section.visible { opacity: 1; }
+
+        /* --- NEW: Animated Section Title --- */
+        .section-title {
+            font-family: var(--font-header);
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 60px;
+            text-transform: uppercase;
+        }
+        .section-title .char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s, transform 0.6s;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 0;
+            z-index: 1000;
+            background: linear-gradient(to bottom, rgba(13, 13, 13, 0.9), rgba(13, 13, 13, 0));
+            transition: background 0.3s, backdrop-filter 0.3s;
+        }
+        .header.scrolled {
+            background: rgba(13, 13, 13, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        .header .container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: var(--font-header); font-size: 1.5rem; text-decoration: none; color: white; }
+        .nav-links a { color: var(--text-color); text-decoration: none; margin-left: 30px; font-weight: 600; position: relative; transition: color 0.3s; }
+        .nav-links a::after { content: ''; position: absolute; width: 100%; transform: scaleX(0); height: 2px; bottom: -5px; left: 0; background-color: var(--primary-green); transform-origin: bottom right; transition: transform 0.3s ease-out; }
+        .nav-links a:hover { color: white; }
+        .nav-links a:hover::after { transform: scaleX(1); transform-origin: bottom left; }
+
+        /* Hero Section */
+        .hero { height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; position: relative; overflow: hidden; }
+        .hero-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://i.ibb.co/s98Syc3f/image-png.png') no-repeat center center/cover; z-index: -1; animation: subtleZoom 25s infinite alternate ease-in-out; }
+        .hero::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: -1; }
+        .hero-content { display: flex; justify-content: space-around; align-items: center; width: 100%; max-width: 1100px; }
+        .hero-name { font-family: var(--font-header); font-size: 5rem; font-weight: 700; color: #fff; opacity: 0; }
+        #alfis-name { animation: slideInFromLeft 1s ease-out 0.5s forwards, glowOrange 3s infinite alternate 1.5s; }
+        #tigry-name { animation: slideInFromRight 1s ease-out 0.5s forwards, glowGreen 3s infinite alternate 1.5s; }
+
+        /* Profiles Section */
+        .profiles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+        .profile-card { background: var(--light-gray); border-radius: 15px; padding: 30px; text-align: center; border: 2px solid #333; transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s; position: relative; overflow: hidden; }
+        .profile-card:hover { transform: translateY(-10px); }
+        .profile-card.green:hover { border-color: var(--primary-green); box-shadow: 0 0 20px rgba(0, 255, 157, 0.4); }
+        .profile-card.orange:hover { border-color: var(--primary-orange); box-shadow: 0 0 20px rgba(255, 123, 0, 0.4); }
+        .profile-card h3 { font-family: var(--font-header); font-size: 2.5rem; margin-bottom: 20px; }
+        .social-links { margin-top: 25px; }
+        .social-links a { color: var(--text-color); font-size: 2.5rem; margin: 0 15px; transition: color 0.3s, text-shadow 0.3s, transform 0.3s; }
+        .social-links a:hover { transform: scale(1.2); }
+        .social-links a.green:hover { color: var(--primary-green); text-shadow: 0 0 15px var(--primary-green); }
+        .social-links a.orange:hover { color: var(--primary-orange); text-shadow: 0 0 15px var(--primary-orange); }
+
+        /* Creations & Games Sections */
+        .creations-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .coming-soon-card { background: var(--light-gray); border-radius: 10px; text-align: center; padding: 40px 20px; min-height: 250px; border: 2px solid #333; transition: transform 0.3s, border-color 0.3s; }
+        .coming-soon-card:hover { transform: translateY(-5px); border-color: var(--primary-green); }
+        .coming-soon-card i { font-size: 4rem; margin-bottom: 20px; animation: iconFloat 4s infinite ease-in-out; }
+        .coming-soon-card h3 { font-family: var(--font-header); font-size: 1.5rem; margin-bottom: 10px; }
+        .games-grid { display: grid; grid-template-columns: minmax(280px, 360px); justify-content: center; gap: 30px; }
+        .game-card { background: var(--dark-bg); border-radius: 10px; overflow: hidden; position: relative; border: 2px solid #333; transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s; aspect-ratio: 1 / 1; }
+        .game-card:hover { transform: translateY(-10px) scale(1.03); border-color: var(--primary-orange); box-shadow: 0 0 25px rgba(255, 123, 0, 0.5); }
+        .game-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease, opacity 0.4s ease; }
+        .game-card:hover img { opacity: 0.1; transform: scale(1.1); }
+        .game-card-title { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; background: linear-gradient(to top, rgba(18, 18, 18, 1), rgba(18, 18, 18, 0)); color: #fff; font-family: var(--font-header); font-size: 1.8rem; transform: translateY(100%); opacity: 0; transition: transform 0.4s ease-out, opacity 0.4s ease-out; }
+        .game-card:hover .game-card-title { transform: translateY(0); opacity: 1; }
+
+        /* Community Section */
+        .community-hub { text-align: center; background: var(--light-gray); padding: 80px 40px; border-radius: 20px; border: 2px solid #333; }
+        .community-hub .discord-logo { font-size: 6rem; margin-bottom: 30px; color: #7289DA; border-radius: 50%; display: inline-block; animation: iconFloat 3s infinite ease-in-out; }
+        .community-hub h3 { font-family: var(--font-header); font-size: 2.5rem; margin-bottom: 15px; }
+        
+        /* Footer */
+        footer { text-align: center; padding: 40px 20px; background: #0a0a0a; margin-top: 100px; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .section-title { font-size: 2.5rem; }
+            .hero-content { flex-direction: column; gap: 40px; }
+            .hero-name { font-size: 3.5rem; }
+            .nav-links { display: none; }
+            .cursor-dot, .cursor-outline { display: none; } /* Hide custom cursor on mobile */
+            * { cursor: auto; } /* Restore default cursor on mobile */
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="preloader"><div class="loader"></div></div>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <header class="header" id="header">
+        <div class="container">
+            <a href="#" class="logo">Alfis & Tigry</a>
+            <nav class="nav-links">
+                <a href="#profiles">Profiles</a>
+                <a href="#creations">Creations</a>
+                <a href="#games">Games</a>
+                <a href="#community">Community</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="hero-background"></div>
+        <div class="hero-content">
+            <h1 id="alfis-name" class="hero-name">Alfis</h1>
+            <h1 id="tigry-name" class="hero-name">Tigry</h1>
+        </div>
+    </section>
+
+    <main>
+        <section class="animated-section" id="profiles">
+            <div class="container">
+                <h2 class="section-title" data-splitting>Player <span class="highlight-orange">Profiles</span></h2>
+                <div class="profiles-grid">
+                    <div class="profile-card green">
+                        <h3 class="highlight-green">Tigry</h3>
+                        <p>Roblox enthusiast and creative force.</p>
+                        <div class="social-links">
+                            <a href="https://www.roblox.com/users/3500870223/profile" target="_blank" class="green"><i class="fa-brands fa-roblox"></i></a>
+                            <a href="https://www.tiktok.com/@tigrypiggyz" target="_blank" class="green"><i class="fa-brands fa-tiktok"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-card orange">
+                        <h3 class="highlight-orange">Alfis</h3>
+                        <p>Master of tutorials and in-game strategies.</p>
+                        <div class="social-links">
+                            <a href="https://www.roblox.com/users/2529531546/profile" target="_blank" class="orange"><i class="fa-brands fa-roblox"></i></a>
+                            <a href="https://www.tiktok.com/@alfis_piggy67" target="_blank" class="orange"><i class="fa-brands fa-tiktok"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="animated-section" id="creations">
+            <div class="container">
+                <h2 class="section-title" data-splitting>Creations <span class="highlight-green">Showcase</span></h2>
+                <div class="creations-grid">
+                    <div class="coming-soon-card"><i class="fa-solid fa-camera highlight-green"></i><h3>Epic Moments</h3><p>Our screenshot gallery is coming soon!</p></div>
+                    <div class="coming-soon-card"><i class="fa-solid fa-video highlight-green"></i><h3>Action Montages</h3><p>A collection of our best clips is on the way!</p></div>
+                    <div class="coming-soon-card"><i class="fa-solid fa-cube highlight-green"></i><h3>Game Builds</h3><p>Showcase of our in-game creations coming soon.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="animated-section" id="games">
+             <div class="container">
+                <h2 class="section-title" data-splitting>Game <span class="highlight-orange">Directory</span></h2>
+                <div class="games-grid">
+                    <div class="game-card">
+                        <img src="https://static.wikia.nocookie.net/roblox-piggy-wikia/images/7/70/PiggyThumbNew.png/revision/latest" alt="Roblox Piggy Game">
+                        <div class="game-card-title">Piggy</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="animated-section" id="community">
+            <div class="container">
+                 <h2 class="section-title" data-splitting>Community <span class="highlight-green">Hub</span></h2>
+                 <div class="community-hub">
+                    <i class="fa-brands fa-discord discord-logo"></i>
+                    <h3>Our Community is Loading...</h3>
+                    <p>The official 'Alfis and Tigry' Discord server is launching soon. Get ready to connect!</p>
+                 </div>
+            </div>
+        </section>
+
+        <section class="animated-section" id="blog">
+             <div class="container">
+                <h2 class="section-title" data-splitting>Adventure <span class="highlight-orange">Log</span></h2>
+                <div class="creations-grid">
+                    <div class="coming-soon-card"><i class="fa-solid fa-feather-pointed highlight-orange"></i><h3>Latest News</h3><p>Our blog and updates section is coming soon!</p></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Alfis and Tigry. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Preloader Logic ---
+            const preloader = document.getElementById('preloader');
+            window.addEventListener('load', () => {
+                preloader.classList.add('hidden');
+            });
+
+            // --- Custom Cursor Logic ---
+            const cursorDot = document.querySelector('.cursor-dot');
+            const cursorOutline = document.querySelector('.cursor-outline');
+            window.addEventListener('mousemove', (e) => {
+                const posX = e.clientX;
+                const posY = e.clientY;
+                cursorDot.style.left = `${posX}px`;
+                cursorDot.style.top = `${posY}px`;
+                cursorOutline.animate({
+                    left: `${posX}px`,
+                    top: `${posY}px`
+                }, { duration: 500, fill: 'forwards' });
+            });
+
+            // --- JS Smooth Scroll Logic ---
+            const navLinks = document.querySelectorAll('.nav-links a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+
+            // --- Letter-by-Letter Animation Logic ---
+            const splitTitles = (selector) => {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(el => {
+                    let text = el.innerText;
+                    let splitText = text.split("").map(char => `<span class="char">${char === ' ' ? '&nbsp;' : char}</span>`).join("");
+                    el.innerHTML = splitText;
+                });
+            };
+            splitTitles('.section-title');
+
+            // --- Intersection Observer for All Animations ---
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // Animate title letters when section is visible
+                        const titleChars = entry.target.querySelectorAll('.section-title .char');
+                        if (titleChars.length > 0) {
+                            titleChars.forEach((char, index) => {
+                                setTimeout(() => {
+                                    char.style.opacity = '1';
+                                    char.style.transform = 'translateY(0)';
+                                }, index * 30);
+                            });
+                        }
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            const animatedSections = document.querySelectorAll('.animated-section');
+            animatedSections.forEach(section => observer.observe(section));
+
+            // --- Header Scroll Logic ---
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', () => {
+                header.classList.toggle('scrolled', window.scrollY > 50);
+            });
+            
+            // --- Parallax Hero Background ---
+            const heroBg = document.querySelector('.hero-background');
+            window.addEventListener('scroll', () => {
+                const offset = window.pageYOffset;
+                heroBg.style.transform = `translateY(${offset * 0.3}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
